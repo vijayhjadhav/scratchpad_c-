@@ -32,8 +32,11 @@ public:
 	SinglyLinkedList(NODE* newNode);
 	void appendNode(int iNewNode);
 	void addNode(int iPrevNode, int iNewNode);
+	void linkNode(int iFromNode, int iToNode);
 	void deleteNode(int iNode);
-	void findNode(int iNode);
+	NODE* findNode(int iNode);
+	NODE* meetingPoint();
+	NODE* BeginningLoopNode();
 	void printList();
 };
 
@@ -45,7 +48,8 @@ SinglyLinkedList::~SinglyLinkedList()
 	{
 		tmp = iter;
 		iter = iter->nextNode;
-		delete tmp;		
+		delete tmp;
+		tmp = NULL;
 	}
 	head = NULL;
 }
@@ -87,6 +91,36 @@ void SinglyLinkedList::addNode(int iPrevNode, int iNewNode)
 	}
 }
 
+void SinglyLinkedList::linkNode(int iFromNode, int iToNode)
+{
+	NODE *ptrFromNode = findNode(iFromNode);
+	NODE* ptrToNode = findNode(iToNode);
+
+	if (NULL == ptrFromNode && NULL == ptrToNode)
+	{
+		cout << "Nodes " << iFromNode << " and " << iToNode << " does not exist" << endl;
+		return;
+	}
+
+	if (NULL == ptrFromNode)
+	{
+		cout << "Node " << iFromNode << " does not exist" << endl;
+		return;
+	}
+
+	if (NULL == ptrToNode)
+	{
+		cout << "Node " << iToNode << " does not exist" << endl;
+		return;
+	}
+	
+	ptrFromNode->nextNode = ptrToNode;
+
+	cout << "From Node " << iFromNode << " is linked to To Node " << iToNode << endl;
+	
+	return;
+}
+
 void SinglyLinkedList::deleteNode(int iNode)
 {
 	if (head == NULL)
@@ -120,22 +154,58 @@ void SinglyLinkedList::deleteNode(int iNode)
 
 }
 
-void SinglyLinkedList::findNode(int iNode)
+NODE *SinglyLinkedList::findNode(int iNode)
 {
 	NODE* iter = head;
 	while (iter != NULL)
 	{
 		if (iter->data == iNode)
 		{
-			cout << iNode << " found" << endl;
-			return;
+			return iter;			
 		}			
 
 		iter = iter->nextNode;
 	}
+		
+	return NULL;
+}
+
+NODE *SinglyLinkedList::meetingPoint()
+{
+	if (head == NULL)
+		return NULL;
 	
-	cout << iNode << " not found" << endl;
-	return;
+	NODE *ptr1 = head;
+	NODE* ptr2 = head;
+	do 
+	{
+		if ((ptr1->nextNode == NULL) ||
+			(ptr2->nextNode == NULL || ptr2->nextNode->nextNode == NULL))
+			return NULL;
+		
+		ptr1 = ptr1->nextNode;
+		ptr2 = ptr2->nextNode->nextNode;
+				
+		cout << "Ptr1 " << ptr1->data << "\tPtr2 " << ptr2->data << endl;
+		
+	} while (ptr1->data != ptr2->data);
+
+	return ptr1;
+}
+
+NODE* SinglyLinkedList::BeginningLoopNode()
+{
+	NODE* ptr2 = meetingPoint();
+	if (ptr2 != NULL)
+	{
+		NODE* ptr1 = head;
+		while (ptr1->data != ptr2->data)
+		{
+			ptr1 = ptr1->nextNode;
+			ptr2 = ptr2->nextNode;
+		}
+	}
+	return ptr2;
 }
 
 void SinglyLinkedList::printList()
@@ -149,6 +219,7 @@ void SinglyLinkedList::printList()
 	cout << endl;
 }
 
+
 int main()
 {
 	SinglyLinkedList objSLL;
@@ -157,18 +228,26 @@ int main()
 	objSLL.appendNode(2);
 	objSLL.appendNode(56);
 	objSLL.appendNode(1);
+	objSLL.appendNode(12);
+	objSLL.appendNode(5);
+	objSLL.appendNode(50);
+	objSLL.appendNode(67);
+	objSLL.appendNode(4);
+	//objSLL.linkNode(4, 1);
+	NODE* ptr = objSLL.BeginningLoopNode();
+	if (ptr != NULL)
+	{
+		cout << "Beginning of Loop Node is " << ptr->data << endl;
+	}
+	else
+		cout << "Loop not found" << endl;
+	//objSLL.printList();
 
-	objSLL.printList();
+	//objSLL.addNode(2, 30);
+	//objSLL.printList();
 
-	objSLL.addNode(2, 30);
-	objSLL.printList();
-
-	objSLL.deleteNode(56);
-	objSLL.printList();
-
-	objSLL.findNode(2);
-
-	objSLL.findNode(34);
+	//objSLL.deleteNode(56);
+	//objSLL.printList();	
 
 	return 0;
 }
