@@ -36,12 +36,17 @@ public:
 	void deleteNode(int iNode);
 	NODE* findNode(int iNode);
 	NODE* meetingPoint();
-	NODE* BeginningLoopNode();
+	NODE* loopStartingPoint();
+	NODE* loopEndingPoint();
 	void printList();
 };
 
 SinglyLinkedList::~SinglyLinkedList()
 {
+	NODE* ptrLastNodeLoop = loopEndingPoint();
+	if (ptrLastNodeLoop != NULL)
+		ptrLastNodeLoop->nextNode = NULL;
+
 	NODE* iter = head;
 	NODE* tmp;
 	while (iter != NULL)
@@ -194,7 +199,7 @@ NODE *SinglyLinkedList::meetingPoint()
 }
 
 //https://stackoverflow.com/questions/1536944/detecting-the-start-of-a-loop-in-a-singly-linked-link-list
-NODE* SinglyLinkedList::BeginningLoopNode()
+NODE* SinglyLinkedList::loopStartingPoint()
 {
 	NODE* ptr2 = meetingPoint();
 	if (ptr2 != NULL)
@@ -207,6 +212,21 @@ NODE* SinglyLinkedList::BeginningLoopNode()
 		}
 	}
 	return ptr2;
+}
+
+NODE* SinglyLinkedList::loopEndingPoint()
+{
+	NODE* ptrLoopEndingPoint = NULL;
+	NODE* ptrLoopStartingPoint = loopStartingPoint();
+	if (ptrLoopStartingPoint != NULL)
+	{
+		ptrLoopEndingPoint = ptrLoopStartingPoint->nextNode;
+		while (ptrLoopEndingPoint->nextNode != ptrLoopStartingPoint)
+		{
+			ptrLoopEndingPoint = ptrLoopEndingPoint->nextNode;
+		}
+	}
+	return ptrLoopEndingPoint;
 }
 
 void SinglyLinkedList::printList()
@@ -234,11 +254,19 @@ int main()
 	objSLL.appendNode(50);
 	objSLL.appendNode(67);
 	objSLL.appendNode(4);
-	//objSLL.linkNode(4, 1);
-	NODE* ptr = objSLL.BeginningLoopNode();
+	objSLL.linkNode(4, 1);
+	NODE* ptr = objSLL.loopStartingPoint();
 	if (ptr != NULL)
 	{
-		cout << "Beginning of Loop Node is " << ptr->data << endl;
+		cout << "First node of the Loop is " << ptr->data << endl;
+	}
+	else
+		cout << "Loop not found" << endl;
+
+	NODE* ptr2 = objSLL.loopEndingPoint();
+	if (ptr2 != NULL)
+	{
+		cout << " Last node of the Loop is " << ptr2->data << endl;
 	}
 	else
 		cout << "Loop not found" << endl;
