@@ -193,6 +193,7 @@ NODE *SinglyLinkedList::meetingPoint()
 	return ptr1;
 }
 
+//https://stackoverflow.com/questions/1536944/detecting-the-start-of-a-loop-in-a-singly-linked-link-list
 NODE* SinglyLinkedList::BeginningLoopNode()
 {
 	NODE* ptr2 = meetingPoint();
