@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 using namespace std;
 
 typedef struct node
@@ -21,6 +22,7 @@ typedef struct node
 class SinglyLinkedList
 {
 	NODE* head;
+	map<int, int> nodeFrequency;
 public:
 	SinglyLinkedList()
 	{
@@ -38,6 +40,8 @@ public:
 	NODE* meetingPoint();
 	NODE* loopStartingPoint();
 	NODE* loopEndingPoint();
+	void removeDuplicatesN2();
+	void removeDuplicatesSinglePass();
 	void printList();
 };
 
@@ -66,6 +70,7 @@ SinglyLinkedList::SinglyLinkedList(NODE* newNode)
 
 void SinglyLinkedList::appendNode(int iNewNode)
 {
+	nodeFrequency[iNewNode]++;
 	NODE* newNode = new NODE(iNewNode);
 	if (head == NULL)
 		head = newNode;
@@ -80,6 +85,7 @@ void SinglyLinkedList::appendNode(int iNewNode)
 
 void SinglyLinkedList::addNode(int iPrevNode, int iNewNode)
 {
+	nodeFrequency[iNewNode]++;
 	NODE* newNode = new NODE(iNewNode);
 
 	NODE* iter = head;
@@ -137,6 +143,8 @@ void SinglyLinkedList::deleteNode(int iNode)
 			NODE* tmp = head;
 			head = head->nextNode;
 			delete tmp;
+			tmp = NULL;
+			nodeFrequency[iNode]--;
 		}
 		else
 		{			
@@ -148,6 +156,7 @@ void SinglyLinkedList::deleteNode(int iNode)
 				{
 					previous->nextNode = iter->nextNode;
 					delete iter;
+					nodeFrequency[iNode]--;
 					break;
 				}
 				previous = iter;
@@ -191,7 +200,7 @@ NODE *SinglyLinkedList::meetingPoint()
 		ptr1 = ptr1->nextNode;
 		ptr2 = ptr2->nextNode->nextNode;
 				
-		cout << "Ptr1 " << ptr1->data << "\tPtr2 " << ptr2->data << endl;
+		//cout << "Ptr1 " << ptr1->data << "\tPtr2 " << ptr2->data << endl;
 		
 	} while (ptr1->data != ptr2->data);
 
@@ -240,6 +249,69 @@ void SinglyLinkedList::printList()
 	cout << endl;
 }
 
+// This one has O(N2) runtime and is not using temporary buffer
+void SinglyLinkedList::removeDuplicatesN2()
+{
+	// Input 23 25 2 56 25 12 25 56 67 4
+	// Output 23 25 2 56 12 67 4
+	NODE* ptrCurrent = head;
+	NODE* ptrNext = NULL;
+	NODE* prevNode = NULL;
+	NODE* tmp = NULL;
+	while (ptrCurrent != NULL)
+	{
+		ptrNext = ptrCurrent->nextNode;
+		prevNode = ptrCurrent;
+		while (ptrNext != NULL)
+		{
+			if (ptrCurrent->data == ptrNext->data)
+			{
+				// Delete this node and continue search for more such nodes		
+				prevNode->nextNode = ptrNext->nextNode;
+				tmp = ptrNext;
+				delete tmp;
+				tmp = NULL;
+				nodeFrequency[ptrCurrent->data]--;
+				ptrNext = prevNode;
+			}
+			prevNode = ptrNext;
+			ptrNext = ptrNext->nextNode;
+		}
+		ptrCurrent = ptrCurrent->nextNode;
+	}	
+}
+
+// This one is using temporary buffer for hash table and is O(N)
+void SinglyLinkedList::removeDuplicatesSinglePass()
+{
+	// Input 23 25 2 56 25 12 25 56 67 4
+	// Output 23 2 12 25 56 67 4
+	NODE* ptr = head;
+	NODE* prev = NULL;
+	NODE* tmp = NULL;
+	while (ptr != NULL)
+	{
+		if (nodeFrequency[ptr->data] > 1)
+		{
+			nodeFrequency[ptr->data]--;
+			tmp = ptr;
+			ptr = ptr->nextNode;
+			
+			if (prev == NULL)
+				head = ptr;				
+			else
+				prev->nextNode = ptr;
+			
+			delete tmp;
+			tmp = NULL;
+		}
+		else
+		{
+			prev = ptr;
+			ptr = ptr->nextNode;
+		}		
+	}
+}
 
 int main()
 {
@@ -248,14 +320,14 @@ int main()
 	objSLL.appendNode(25);
 	objSLL.appendNode(2);
 	objSLL.appendNode(56);
-	objSLL.appendNode(1);
+	objSLL.appendNode(25);
 	objSLL.appendNode(12);
-	objSLL.appendNode(5);
-	objSLL.appendNode(50);
+	objSLL.appendNode(25);
+	objSLL.appendNode(56);
 	objSLL.appendNode(67);
 	objSLL.appendNode(4);
-	objSLL.linkNode(4, 1);
-	NODE* ptr = objSLL.loopStartingPoint();
+	//objSLL.linkNode(4, 1);
+	/*NODE* ptr = objSLL.loopStartingPoint();
 	if (ptr != NULL)
 	{
 		cout << "First node of the Loop is " << ptr->data << endl;
@@ -269,8 +341,10 @@ int main()
 		cout << " Last node of the Loop is " << ptr2->data << endl;
 	}
 	else
-		cout << "Loop not found" << endl;
-	//objSLL.printList();
+		cout << "Loop not found" << endl;*/
+	objSLL.printList();
+	objSLL.removeDuplicatesSinglePass();
+	objSLL.printList();
 
 	//objSLL.addNode(2, 30);
 	//objSLL.printList();
