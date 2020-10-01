@@ -65,7 +65,7 @@ void printArray(vector<int> vArray)
 
 int main()
 {
-	vector<int> vArray{ 23,45,24,5,7,9,10, 15 };
+	vector<int> vArray{ 23,45,24,5,7,9,10,15,20 };
 	printArray(vArray);
 	mgSort(vArray, 0, vArray.size() - 1);
 	printArray(vArray);
