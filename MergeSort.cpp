@@ -2,6 +2,7 @@
 #include <vector>
 using namespace std;
 void merge(vector<int>& vArray, int left, int middle, int right);
+
 void mgSort(vector<int> &vArray, int left, int right)
 {
 	if (left < right)
