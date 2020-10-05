@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string>
 using namespace std;
-typedef unsigned long long int uLL;
+typedef __int64 uLL;
 
 uLL karatsuba(uLL x, uLL y)
 {
@@ -23,9 +23,7 @@ uLL karatsuba(uLL x, uLL y)
 	uLL d = karatsuba(x_L, y_L);
 	uLL e = karatsuba(x_H + x_L, y_H + y_L) - a - d;
 	
-	cout << to_string(a * (pow(10, m * 2)) + e * (pow(10, m)) + d) << endl;
-	
-	return uLL(a * (pow(10, m*2)) + e * (pow(10, m)) + d);
+	return a * (uLL)(pow(10, m*2)) + e * (uLL)(pow(10, m)) + d;
 }
 
 int main()
@@ -34,6 +32,8 @@ int main()
 	cout << sizeof(unsigned long long int) << endl;
 	cout << karatsuba(12, 12) << endl;
 	cout << karatsuba(1234, 4321) << endl;
-	cout << karatsuba(99999999, 99999999) << endl;
+	cout << karatsuba(999999999, 999999999) << endl;
+	__int64 i = (__int64)999999999 * 999999999;
+	cout << i << endl;
 	return 0;
 }
