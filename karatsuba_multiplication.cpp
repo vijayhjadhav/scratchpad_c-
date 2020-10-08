@@ -4,17 +4,23 @@
 #include <string>
 #include <vector>
 using namespace std;
+
 typedef __int64 uLL;
+typedef vector<int> LARGE_INTEGERS;
 
 uLL karatsuba(uLL x, uLL y);
-vector<int> karatsuba(vector<int> x, vector<int> y);
-void powb10(vector<int> &arr, uLL& m, const uLL& multiplier);
-void splitArray(vector<int>& arr, int m, vector<int>& higherBits, vector<int>& lowerBits);
-void normalizeSize(vector<int>& x, vector<int>& y);
-vector<int> operator+(vector<int> num1, vector<int> num2);
-vector<int> operator-(vector<int> num1, vector<int> num2);
-vector<int> operator*(vector<int>& num1, vector<int>& num2);
-void print(vector<int> result);
+LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level);
+void powb10(LARGE_INTEGERS &arr, uLL& m, const uLL& multiplier, int level);
+void splitArray(LARGE_INTEGERS& arr, int m, LARGE_INTEGERS& higherBits, LARGE_INTEGERS& lowerBits);
+void normalizeSize(LARGE_INTEGERS& x, LARGE_INTEGERS& y);
+LARGE_INTEGERS operator+(LARGE_INTEGERS num1, LARGE_INTEGERS num2);
+LARGE_INTEGERS operator-(LARGE_INTEGERS num1, LARGE_INTEGERS num2);
+LARGE_INTEGERS operator*(LARGE_INTEGERS& num1, LARGE_INTEGERS& num2);
+void print(LARGE_INTEGERS result);
+void printExp(LARGE_INTEGERS& num1, LARGE_INTEGERS& num2, LARGE_INTEGERS& result, const string& operation, int level = 0);
+void printFunStartMessage(const char* sFuncName, int level);
+void printFunEndMessage(const char* sFuncName, int level);
+void adjustSpace(int level);
 
 uLL karatsuba(uLL x, uLL y)
 {
@@ -37,14 +43,23 @@ uLL karatsuba(uLL x, uLL y)
 	return a * (uLL)(pow(10, m*2)) + e * (uLL)(pow(10, m)) + d;
 }
 
-vector<int> karatsuba(vector<int> x, vector<int> y)
+LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level)
 {
+	printFunStartMessage(__func__, level);
+
+	adjustSpace(level);
+	cout << "k ( " ;
+	print(x);
+	cout << " , ";
+	print(y);
+	cout << " ) " << endl;
+
 	// Make number of digits same in both numbers
 	normalizeSize(x, y);
 
 	size_t szX = x.size();
 	size_t szY = y.size();
-	vector<int> result;
+	LARGE_INTEGERS result;
 
 	if ((szX < 2) && (szY < 2))
 	{
@@ -57,48 +72,75 @@ vector<int> karatsuba(vector<int> x, vector<int> y)
 		prod = prod / 10;
 		if (digit > 0)
 			result.insert(result.begin(), digit);
+
+		printExp(x, y, result, "*", level);
+
+		printFunEndMessage(__func__, level);
+
 		return result;
 	}
 
 	size_t n = max(szX, szY);
 	uLL m = ceil(n / 2);
 
-	vector<int> x_H;
-	vector<int> x_L;
+	LARGE_INTEGERS x_H;
+	LARGE_INTEGERS x_L;
 
 	splitArray(x, m, x_H, x_L);
 
-	vector<int> y_H;
-	vector<int> y_L;
+	LARGE_INTEGERS y_H;
+	LARGE_INTEGERS y_L;
 
 	splitArray(y, m, y_H, y_L);
 
-	vector<int> a = karatsuba(x_H, y_H);
-	vector<int> d = karatsuba(x_L, y_L);
-	vector<int> xHplusxL = x_H + x_L;
-	vector<int> yHplusyL = y_H + y_L;
-	vector<int> aplusd = a + d;
-	vector<int> xHpxLprodyHpyL = karatsuba(xHplusxL, yHplusyL);
-	vector<int> e = xHpxLprodyHpyL - aplusd;
-	powb10(a, m, 2);
-	powb10(e, m, 1);
-	vector<int> a10m2pluse10m = a + e;
+	LARGE_INTEGERS a = karatsuba(x_H, y_H, level + 1);
+	LARGE_INTEGERS d = karatsuba(x_L, y_L, level + 1);
+	LARGE_INTEGERS aplusd = a + d;
+
+	LARGE_INTEGERS xHplusxL = x_H + x_L;
+	LARGE_INTEGERS yHplusyL = y_H + y_L;
+	LARGE_INTEGERS xHpxLprodyHpyL = karatsuba(xHplusxL, yHplusyL, level + 1);
+	LARGE_INTEGERS e = xHpxLprodyHpyL - aplusd;
+	powb10(a, m, 2, level+1);
+	powb10(e, m, 1, level+1);
+	LARGE_INTEGERS a10m2pluse10m = a + e + d;
+
+	printExp(x, y, a10m2pluse10m, "*", level+1);
+
+	printFunEndMessage(__func__, level);
+
 	return a10m2pluse10m + d;
 
+	
 	//return a * (uLL)(pow(10, m * 2)) + e * (uLL)(pow(10, m)) + d;
+	
 }
 
-void powb10(vector<int> &arr, uLL &m, const uLL &multiplier)
+void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
 {
+	printFunStartMessage(__func__, level);
 	int numZeros = m * multiplier;
+
+	adjustSpace(level+1);
+	cout << "input number is ";
+	print(arr);
+	
+	adjustSpace(level + 1);
+	cout << "m = " << m << " multiplier = " << multiplier << endl;
 
 	for (int i = 0; i < numZeros; i++)
 	{
 		arr.push_back(0);
 	}
+
+	adjustSpace(level+1);
+	cout << "output number is ";
+	print(arr);
+
+	printFunEndMessage(__func__, level);
 }
 
-void splitArray(vector<int>& arr, int m, vector<int>& higherBits, vector<int>& lowerBits)
+void splitArray(LARGE_INTEGERS& arr, int m, LARGE_INTEGERS& higherBits, LARGE_INTEGERS& lowerBits)
 {
 	higherBits.resize(m);
 	lowerBits.resize(arr.size()-m);
@@ -114,7 +156,7 @@ void splitArray(vector<int>& arr, int m, vector<int>& higherBits, vector<int>& l
 	}
 }
 
-void normalizeSize(vector<int>& x, vector<int>& y)
+void normalizeSize(LARGE_INTEGERS& x, LARGE_INTEGERS& y)
 {
 	size_t szX = x.size();
 	size_t szY = y.size();
@@ -123,7 +165,7 @@ void normalizeSize(vector<int>& x, vector<int>& y)
 	if (0 == diff)
 		return;
 
-	vector<int>::iterator iter;
+	LARGE_INTEGERS::iterator iter;
 	if (szX > szY)
 	{
 		iter = y.begin();
@@ -134,15 +176,16 @@ void normalizeSize(vector<int>& x, vector<int>& y)
 		iter = x.begin();
 		x.insert(iter, diff, 0);		
 	}
+
 }
 
-vector<int> operator+(vector<int> num1, vector<int> num2)
+LARGE_INTEGERS operator+(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 {
 	normalizeSize(num1, num2);
 	size_t szNum1 = num1.size();
 	size_t szNum2 = num2.size();
 	size_t szMax = max(szNum1, szNum2);
-	vector<int> result(szMax, 0);
+	LARGE_INTEGERS result(szMax, 0);
 	int sum = 0;
 	int carry = 0;
 	while (szMax > 0)
@@ -163,14 +206,16 @@ vector<int> operator+(vector<int> num1, vector<int> num2)
 		result.insert(result.begin(), carry);
 	}
 
-	return result;
+	printExp(num1, num2, result, "+");
+
+	return result;	
 }
 
-vector<int> operator-(vector<int> num1, vector<int> num2)
+LARGE_INTEGERS operator-(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 {
 	normalizeSize(num1, num2);
 	size_t szMax = max(num1.size(), num2.size());
-	vector<int> result(szMax, 0);
+	LARGE_INTEGERS result(szMax, 0);
 	int carry = 0;
 	int carryIndex = 0;
 	for (int index = szMax - 1; index >= 0; index--)
@@ -188,28 +233,69 @@ vector<int> operator-(vector<int> num1, vector<int> num2)
 	}
 
 	// remove leading zero's
-	vector<int>::iterator iterBegin = result.begin();
-	vector<int>::iterator iterEnd = result.begin();
+	LARGE_INTEGERS::iterator iterBegin = result.begin();
+	LARGE_INTEGERS::iterator iterEnd = result.begin();
 	while (iterEnd != result.end() && *iterEnd == 0)
 	{
 		iterEnd++;
 	}
 	result.erase(iterBegin, iterEnd);
 
-	return result;
+	printExp(num1, num2, result, "-");
+
+	return result;	
 }
 
-vector<int> operator*(vector<int>& num1, vector<int>& num2)
+LARGE_INTEGERS operator*(LARGE_INTEGERS& num1, LARGE_INTEGERS& num2)
 {
-	return karatsuba(num1, num2);
+	return karatsuba(num1, num2, 0);	
 }
 
-void print(vector<int> result)
+void print(LARGE_INTEGERS result)
 {
 	for (int i = 0; i < result.size(); i++)
 	{
 		cout << result[i];
 	}
+}
+
+void adjustSpace(int level)
+{
+	for (int ntab = 0; ntab < level; ntab++)
+		cout << "\t";
+}
+
+void printFunStartMessage(const char* sFuncName, int level)
+{
+	adjustSpace(level);
+	cout << sFuncName << " : Start..." << endl;
+}
+
+void printFunEndMessage(const char* sFuncName, int level)
+{
+	adjustSpace(level);
+	cout << sFuncName << " : End..." << endl;
+}
+
+void printExp(LARGE_INTEGERS &num1, LARGE_INTEGERS &num2, LARGE_INTEGERS &result, const string &operation, int level)
+{
+	size_t szNum1 = num1.size();
+	size_t szNum2 = num2.size();
+	size_t szResult = result.size();
+
+	adjustSpace(level);
+
+	for (auto& i : num1)
+		cout << i;
+	cout << " " << operation << " ";
+
+	for (auto& i : num2)
+		cout << i;
+	cout << " = ";
+
+	for (auto& i : result)
+		cout << i;
+
 	cout << endl;
 }
 
@@ -230,16 +316,16 @@ int main()
 	// { 1, 8, 9, 7 } 
 
 
-	vector<int> num1{ 2,0,0,6 };
-	vector<int> num2{ 1,8,9,7 };
+	LARGE_INTEGERS num1{ 2,0,0,6 };
+	LARGE_INTEGERS num2{ 1,8,9,7 };
 	print(num1);
 	print(num2);
-	//vector<int> sum = num1 + num2;
-	//vector<int> sub = num1 - num2;
-	vector<int> prod = num1 * num2;
+	//LARGE_INTEGERS sum = num1 + num2;
+	//LARGE_INTEGERS sub = num1 - num2;
+	LARGE_INTEGERS prod = num1 * num2;
 	
 	//print(sum);
-	print(prod);
+	//print(prod);
 	//print(sub);
 	
 	return 0;
