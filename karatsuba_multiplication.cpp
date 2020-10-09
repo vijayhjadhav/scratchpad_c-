@@ -7,7 +7,7 @@ using namespace std;
 
 typedef __int64 uLL;
 typedef vector<int> LARGE_INTEGERS;
-
+int glevel = 0;
 uLL karatsuba(uLL x, uLL y);
 LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level);
 void powb10(LARGE_INTEGERS &arr, uLL& m, const uLL& multiplier, int level);
@@ -46,6 +46,7 @@ uLL karatsuba(uLL x, uLL y)
 LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level)
 {
 	printFunStartMessage(__func__, level);
+	glevel = level;
 
 	adjustSpace(level);
 	cout << "k ( " ;
@@ -103,17 +104,16 @@ LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level)
 	LARGE_INTEGERS e = xHpxLprodyHpyL - aplusd;
 	powb10(a, m, 2, level+1);
 	powb10(e, m, 1, level+1);
-	LARGE_INTEGERS a10m2pluse10m = a + e + d;
+	LARGE_INTEGERS a10m2pluse10m = a + e;
 
 	printExp(x, y, a10m2pluse10m, "*", level+1);
 
+	result = a10m2pluse10m + d;
+
 	printFunEndMessage(__func__, level);
-
-	return a10m2pluse10m + d;
-
 	
+	return result;
 	//return a * (uLL)(pow(10, m * 2)) + e * (uLL)(pow(10, m)) + d;
-	
 }
 
 void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
@@ -124,6 +124,7 @@ void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
 	adjustSpace(level+1);
 	cout << "input number is ";
 	print(arr);
+	cout << endl;
 	
 	adjustSpace(level + 1);
 	cout << "m = " << m << " multiplier = " << multiplier << endl;
@@ -136,6 +137,7 @@ void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
 	adjustSpace(level+1);
 	cout << "output number is ";
 	print(arr);
+	cout << endl;
 
 	printFunEndMessage(__func__, level);
 }
@@ -206,7 +208,7 @@ LARGE_INTEGERS operator+(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 		result.insert(result.begin(), carry);
 	}
 
-	printExp(num1, num2, result, "+");
+	printExp(num1, num2, result, "+", glevel);
 
 	return result;	
 }
@@ -241,7 +243,7 @@ LARGE_INTEGERS operator-(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 	}
 	result.erase(iterBegin, iterEnd);
 
-	printExp(num1, num2, result, "-");
+	printExp(num1, num2, result, "-", glevel);
 
 	return result;	
 }
