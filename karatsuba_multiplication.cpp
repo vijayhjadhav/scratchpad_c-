@@ -21,6 +21,7 @@ void printExp(LARGE_INTEGERS& num1, LARGE_INTEGERS& num2, LARGE_INTEGERS& result
 void printFunStartMessage(const char* sFuncName, int level);
 void printFunEndMessage(const char* sFuncName, int level);
 void adjustSpace(int level);
+void processInput(string sNum1, string sNum2, LARGE_INTEGERS& num1, LARGE_INTEGERS& num2);
 
 uLL karatsuba(uLL x, uLL y)
 {
@@ -96,26 +97,21 @@ LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level)
 
 	LARGE_INTEGERS a = karatsuba(x_H, y_H, level + 1);
 	LARGE_INTEGERS d = karatsuba(x_L, y_L, level + 1);
-	//LARGE_INTEGERS aplusd = a + d;
-
+	
 	LARGE_INTEGERS xHplusxL = x_H + x_L;
 	LARGE_INTEGERS yHplusyL = y_H + y_L;
-	//LARGE_INTEGERS xHpxLprodyHpyL = karatsuba(xHplusxL, yHplusyL, level + 1);
-	//LARGE_INTEGERS e = xHpxLprodyHpyL - a - d;// aplusd;
 	LARGE_INTEGERS e = karatsuba(x_H + x_L, y_H + y_L, level + 1) - a - d;
 	LARGE_INTEGERS a10m2 = powb10(a, m, 2, level+1);
 	LARGE_INTEGERS e10m1 = powb10(e, m, 1, level+1);
-	//LARGE_INTEGERS a10m2pluse10m = a + e;
-
-	//printExp(x, y, a10m2pluse10m, "*", level+1);
-
-	//result = a10m2pluse10m + d;
+	
+	// a*10^(m*2) + e*10^(m*1) + d
 	result = a10m2 + e10m1 + d;
+
 	printExp(x, y, result, "*", level + 1);
+
 	printFunEndMessage(__func__, level);
 	
 	return result;
-	//return a * (uLL)(pow(10, m * 2)) + e * (uLL)(pow(10, m)) + d;
 }
 
 LARGE_INTEGERS powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
@@ -148,7 +144,6 @@ LARGE_INTEGERS powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int le
 
 void splitArray(LARGE_INTEGERS& arr, int m, LARGE_INTEGERS& higherBits, LARGE_INTEGERS& lowerBits)
 {
-
 	higherBits.resize(arr.size() -m);
 	lowerBits.resize(m);
 	int k = 0;
@@ -319,6 +314,23 @@ void printExp(LARGE_INTEGERS &num1, LARGE_INTEGERS &num2, LARGE_INTEGERS &result
 	cout << endl;
 }
 
+void processInput(string sNum1, string sNum2, LARGE_INTEGERS &num1, LARGE_INTEGERS &num2)
+{
+	size_t szNum1 = sNum1.size();
+	num1.resize(szNum1);
+	for (int index = 0; index < szNum1; index++)
+	{
+		num1[index] = sNum1.at(index) - '0';
+	}
+
+	size_t szNum2 = sNum2.size();
+	num2.resize(szNum2);
+	for (int index = 0; index < szNum2; index++)
+	{
+		num2[index] = sNum2.at(index) - '0';
+	}
+}
+
 int main()
 {
 	/*cout << sizeof(uLL) << endl;
@@ -336,13 +348,32 @@ int main()
 	// { 1, 8, 9, 7 } 
 	// { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }
 	// { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }
+	/* { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	     9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	     9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+	     9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 } 
+    */
 
 
-	LARGE_INTEGERS num1{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
-	LARGE_INTEGERS num2{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+	LARGE_INTEGERS num1; /*{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };*/
+	LARGE_INTEGERS num2; /*{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
+		                 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };*/
+
+	processInput("3141592653589793238462643383279502884197169399375105820974944592",
+		"2718281828459045235360287471352662497757247093699959574966967627",
+		num1, num2);
+
 	print(num1);
+	cout << endl;
 	print(num2);
+	cout << endl;
 	LARGE_INTEGERS prod = num1 * num2;
+	// prod = 8539734222673567065463550869546574495034888535765114961879601127067743044893204848617875072216249073013374895871952806582723184
 
 	return 0;
 }
