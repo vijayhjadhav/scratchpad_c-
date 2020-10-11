@@ -10,7 +10,7 @@ typedef vector<int> LARGE_INTEGERS;
 int glevel = 0;
 uLL karatsuba(uLL x, uLL y);
 LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level);
-void powb10(LARGE_INTEGERS &arr, uLL& m, const uLL& multiplier, int level);
+LARGE_INTEGERS powb10(LARGE_INTEGERS &arr, uLL& m, const uLL& multiplier, int level);
 void splitArray(LARGE_INTEGERS& arr, int m, LARGE_INTEGERS& higherBits, LARGE_INTEGERS& lowerBits);
 void normalizeSize(LARGE_INTEGERS& x, LARGE_INTEGERS& y);
 LARGE_INTEGERS operator+(LARGE_INTEGERS num1, LARGE_INTEGERS num2);
@@ -96,27 +96,29 @@ LARGE_INTEGERS karatsuba(LARGE_INTEGERS x, LARGE_INTEGERS y, int level)
 
 	LARGE_INTEGERS a = karatsuba(x_H, y_H, level + 1);
 	LARGE_INTEGERS d = karatsuba(x_L, y_L, level + 1);
-	LARGE_INTEGERS aplusd = a + d;
+	//LARGE_INTEGERS aplusd = a + d;
 
 	LARGE_INTEGERS xHplusxL = x_H + x_L;
 	LARGE_INTEGERS yHplusyL = y_H + y_L;
-	LARGE_INTEGERS xHpxLprodyHpyL = karatsuba(xHplusxL, yHplusyL, level + 1);
-	LARGE_INTEGERS e = xHpxLprodyHpyL - aplusd;
-	powb10(a, m, 2, level+1);
-	powb10(e, m, 1, level+1);
-	LARGE_INTEGERS a10m2pluse10m = a + e;
+	//LARGE_INTEGERS xHpxLprodyHpyL = karatsuba(xHplusxL, yHplusyL, level + 1);
+	//LARGE_INTEGERS e = xHpxLprodyHpyL - a - d;// aplusd;
+	LARGE_INTEGERS e = karatsuba(x_H + x_L, y_H + y_L, level + 1) - a - d;
+	LARGE_INTEGERS a10m2 = powb10(a, m, 2, level+1);
+	LARGE_INTEGERS e10m1 = powb10(e, m, 1, level+1);
+	//LARGE_INTEGERS a10m2pluse10m = a + e;
 
-	printExp(x, y, a10m2pluse10m, "*", level+1);
+	//printExp(x, y, a10m2pluse10m, "*", level+1);
 
-	result = a10m2pluse10m + d;
-
+	//result = a10m2pluse10m + d;
+	result = a10m2 + e10m1 + d;
+	printExp(x, y, result, "*", level + 1);
 	printFunEndMessage(__func__, level);
 	
 	return result;
 	//return a * (uLL)(pow(10, m * 2)) + e * (uLL)(pow(10, m)) + d;
 }
 
-void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
+LARGE_INTEGERS powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
 {
 	printFunStartMessage(__func__, level);
 	int numZeros = m * multiplier;
@@ -129,32 +131,37 @@ void powb10(LARGE_INTEGERS &arr, uLL &m, const uLL &multiplier, int level)
 	adjustSpace(level + 1);
 	cout << "m = " << m << " multiplier = " << multiplier << endl;
 
+	LARGE_INTEGERS result(arr);
 	for (int i = 0; i < numZeros; i++)
 	{
-		arr.push_back(0);
+		result.push_back(0);
 	}
 
 	adjustSpace(level+1);
 	cout << "output number is ";
-	print(arr);
+	print(result);
 	cout << endl;
 
 	printFunEndMessage(__func__, level);
+	return result;
 }
 
 void splitArray(LARGE_INTEGERS& arr, int m, LARGE_INTEGERS& higherBits, LARGE_INTEGERS& lowerBits)
 {
-	higherBits.resize(m);
-	lowerBits.resize(arr.size()-m);
 
-	for (int i = 0; i < m; i++)
+	higherBits.resize(arr.size() -m);
+	lowerBits.resize(m);
+	int k = 0;
+	for (int i = 0; i < higherBits.size(); i++)
 	{
-		higherBits[i] = arr[i];
+		higherBits[i] = arr[k];
+		k++;
     }
 
-	for (int j = m; j < arr.size(); j++)
+	for (int j = 0; j < lowerBits.size(); j++)
 	{
-		lowerBits[j - m] = arr[j];
+		lowerBits[j] = arr[k];
+		k++;
 	}
 }
 
@@ -162,8 +169,8 @@ void normalizeSize(LARGE_INTEGERS& x, LARGE_INTEGERS& y)
 {
 	size_t szX = x.size();
 	size_t szY = y.size();
-	int diff = abs((int)(szX - szY));
 	
+	int diff = abs((int)(szX - szY));
 	if (0 == diff)
 		return;
 
@@ -174,12 +181,12 @@ void normalizeSize(LARGE_INTEGERS& x, LARGE_INTEGERS& y)
 		y.insert(iter, diff, 0);
 	}
 	else
-	{		
+	{
 		iter = x.begin();
-		x.insert(iter, diff, 0);		
+		x.insert(iter, diff, 0);
 	}
-
 }
+
 
 LARGE_INTEGERS operator+(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 {
@@ -229,8 +236,19 @@ LARGE_INTEGERS operator-(LARGE_INTEGERS num1, LARGE_INTEGERS num2)
 		}
 		else
 		{
-			result[index] = num1[index] - num2[index] - carry;
-			carry = 0;
+			if (carry == 1 && (num1[index] > num2[index]))
+			{
+				result[index] = num1[index] - num2[index] - carry;
+				carry = 0;
+			}
+			else if(carry == 1 && (num1[index] == num2[index]))
+			{
+				result[index] = num1[index] - num2[index] + 10 - carry;
+			}
+			else
+			{
+				result[index] = num1[index] - num2[index];
+			}
 		}
 	}
 
@@ -316,19 +334,15 @@ int main()
 	// { 5, 6, 1, 2, 4, 9, 0, 8, 3, 1, 5, 3, 1 }
 	// { 2, 0, 0, 6 }
 	// { 1, 8, 9, 7 } 
+	// { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }
+	// { 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 }
 
 
-	LARGE_INTEGERS num1{ 2,0,0,6 };
-	LARGE_INTEGERS num2{ 1,8,9,7 };
+	LARGE_INTEGERS num1{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
+	LARGE_INTEGERS num2{ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
 	print(num1);
 	print(num2);
-	//LARGE_INTEGERS sum = num1 + num2;
-	//LARGE_INTEGERS sub = num1 - num2;
 	LARGE_INTEGERS prod = num1 * num2;
-	
-	//print(sum);
-	//print(prod);
-	//print(sub);
-	
+
 	return 0;
 }
