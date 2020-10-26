@@ -6,13 +6,11 @@ using namespace std;
 
 #pragma once
 
-PointsArray closestPair_BruteForce(PointsArray &lstPoints, float& min);
-float distance(Point P1, Point P2);
-PointsArray closestPair_BruteForce(PointsArray& ArrayPoints);
-//int compareX(void* a, void* b);
-//int compareY(void* a, void* b);
-
 float min(float x, float y);
+float distance(Point P1, Point P2);
+PointsArray closestPair_BruteForce(PointsArray& ArrayPoints, int Left, int Right);
+PointsArray closestSplitPair(PointsArray& strip, float minDistance);
+PointsArray closestPair(PointsArray& Px, int Left, int Right);
 
 float min(float x, float y)
 {
@@ -24,14 +22,13 @@ float distance(Point P1, Point P2)
 	return sqrtf(((P1.x - P2.x) * (P1.x - P2.x)) + ((P1.y - P2.y) * (P1.y - P2.y)));
 }
 
-PointsArray closestPair_BruteForce(PointsArray& ArrayPoints)
+PointsArray closestPair_BruteForce(PointsArray& ArrayPoints, int Left, int Right)
 {
-	size_t szList = ArrayPoints.size();
 	float minDistance = FLT_MAX;
 	PointsArray lstClosestPair(2);
-	for (size_t i = 0; i < szList; i++)
+	for (size_t i = Left; i <= Right; i++)
 	{
-		for (size_t j = i + 1; j < szList; j++)
+		for (size_t j = i + 1; j <= Right; j++)
 		{
 			if (distance(ArrayPoints[i], ArrayPoints[j]) < minDistance)
 			{
@@ -67,16 +64,18 @@ PointsArray closestPair(PointsArray& Px, int Left, int Right)
 {
 	size_t szArray = Right-Left+1;
 	if (szArray <= 3)
-		return closestPair_BruteForce(Px);
+		return closestPair_BruteForce(Px, Left, Right);
 	
-	int mid = szArray / 2;
+	int mid = (szArray / 2) - 1;
 	Point midPoint = Px[mid];
 	
 	PointsArray closestPairLeftArray = closestPair(Px, Left, mid);
 	PointsArray closestPairRightArray = closestPair(Px, mid + 1, Right);
 
-	float minDistanceLeft = distance(closestPairLeftArray[0], closestPairLeftArray[1]);
-	float minDistantRight = distance(closestPairRightArray[0], closestPairRightArray[1]);
+	float minDistanceLeft = FLT_MAX;
+	float minDistantRight = FLT_MAX;
+	minDistanceLeft = distance(closestPairLeftArray[0], closestPairLeftArray[1]);
+	minDistantRight = distance(closestPairRightArray[0], closestPairRightArray[1]);
 
 	PointsArray closestPairArray;
 	if (minDistanceLeft < minDistantRight)
@@ -96,57 +95,21 @@ PointsArray closestPair(PointsArray& Px, int Left, int Right)
 	}
 
 	MergeSort objSort;
-	objSort.mgSort(strip, 0, strip.size(), compareY);
-	//sort(strip.begin(), strip.end(), compareY);
-	PointsArray closestPairSplitPair = closestSplitPair(strip, minDistance);
-	float minDistanceSplitPair = distance(closestPairSplitPair[0], closestPairSplitPair[1]);
+	objSort.mgSort(strip, 0, strip.size()-1, compareY);
+	
+	PointsArray closestPairSplitPair;
+	float minDistanceSplitPair = FLT_MAX;
+	if (strip.size() > 1)
+	{
+		closestPairSplitPair = closestSplitPair(strip, minDistance);
+		minDistanceSplitPair = distance(closestPairSplitPair[0], closestPairSplitPair[1]);
+	}
+	
 	if (minDistance > minDistanceSplitPair)
 		closestPairArray = closestPairSplitPair;
 
 	return closestPairArray;
 }
-
-/*PointsArray closestPair(PointsArray& Px, PointsArray& Py, int Left, int Right)
-{
-	size_t szArray = Px.size();
-	float minDistance;
-	if (szArray <= 3)
-	{
-		PointsArray ClosestPairPx = closestPair_BruteForce(Px);
-		PointsArray ClosestPairPy = closestPair_BruteForce(Py);
-
-		if (distance(ClosestPairPx[0], ClosestPairPx[1]) < distance(ClosestPairPy[0], ClosestPairPy[1]))
-			return ClosestPairPx;
-		else
-			return ClosestPairPy;
-	}		
-
-	int mid = szArray / 2;
-	Point midPointX = Px[mid];
-	//Point midPointY = Py[mid];
-		
-	PointsArray closestPairLeftArray = closestPair(Px, Py, Left, mid);
-	PointsArray closestPairRightArray = closestPair(Px, Py, mid + 1, Right);
-
-	minDistance = min(distance(closestPairLeftArray[0], closestPairLeftArray[1]),
-		              distance(closestPairRightArray[0], closestPairRightArray[1]));
-	PointsArray stripUnsorted(szArray);
-	for (size_t i = 0; i < szArray; i++)
-	{
-		if (abs(Px[i].x - midPointX.x) < minDistance)
-		{
-			stripUnsorted.push_back(Px[i]);
-		}
-	}
-
-	PointsArray stripSorted(stripUnsorted.size());
-	for (size_t j = 0; j < szArray; j++)
-	{
-		if(Py[j] == )
-	}
-
-	return closestSplitPair(stripSorted, minDistance);
-}*/
 
 int main()
 {
@@ -156,9 +119,8 @@ int main()
 	PointsArray Py = P;
 	MergeSort objMsort;
 	objMsort.mgSort(Px, 0, Px.size()-1, compareX);
-	//objMsort.mgSort(Py, 0, Py.size()-1, compareY);
 	
-	PointsArray ClosestPairBF = closestPair_BruteForce(P);
+	PointsArray ClosestPairBF = closestPair_BruteForce(P, 0, P.size()-1);
 	PointsArray ClosestPairDC = closestPair(Px, 0, Px.size() - 1);
 	return 0;
 }
