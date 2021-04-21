@@ -6,9 +6,13 @@
 #include<iso646.h>
 using namespace std;
 
+void oneDArray();
+void twoDArray();
+
 int main() {
-    /* Enter your code here. Read input from STDIN. Print output to STDOUT */   
-    int N, NQ;
+	oneDArray();
+	twoDArray();
+/*    int N, NQ;
     cin >> N >> NQ;
 
 	vector<vector<long long>>seqList(N);
@@ -50,7 +54,7 @@ int main() {
 		}
 	}
  
-
+ */
  //   int **seqList = new int*[N];
  //   for(int i = 0; i < N; i++)
  //   {
@@ -80,4 +84,45 @@ int main() {
  //       }
  //   }
     return 0;
+}
+
+void twoDArray()
+{
+	int **matrix = new int*[2];
+
+	for (int i = 0; i < 2; i++)
+	{
+		matrix[i] = new int[2]{ i + 1, i + 2 };
+	}
+	
+	
+	for (int i = 0; i < 2; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		    cout << matrix[i][j] << "\t";
+		cout << endl;
+	}
+
+	cout << endl;
+
+	for (int k = 0; k < 2; k++)
+	{
+		delete[] matrix[k];
+	}
+
+	delete[] matrix;
+}
+
+void oneDArray()
+{
+	int* matrix = new int[2]{ 2,3 };
+	
+	for (int i = 0; i < 2; i++)
+	{
+		cout << matrix[i] << "\t";
+	}
+
+	cout << endl;
+
+	delete[] matrix;
 }
