@@ -38,10 +38,10 @@ public:
 
 };
 
-class binaryTree
+class binarySearchTree
 {
 public:
-	binaryTree() :root(nullptr) {}
+	binarySearchTree() :root(nullptr) {}
 	void insert(int data);
 	bool contains(int data);
 	void printInOrder();
@@ -59,7 +59,7 @@ private:
 	NODE root;
 };
 
-void binaryTree::insert(int data)
+void binarySearchTree::insert(int data)
 {
 	NODE newNode = make_shared<Node>(data);
 	if (root == nullptr)
@@ -71,7 +71,7 @@ void binaryTree::insert(int data)
 	insert(root, newNode);	
 }
 
-void binaryTree::insert(NODE currentNode, NODE newNode)
+void binarySearchTree::insert(NODE currentNode, NODE newNode)
 {
 	if (newNode->data <= currentNode->data)
 	{
@@ -93,12 +93,12 @@ void binaryTree::insert(NODE currentNode, NODE newNode)
 	}
 }
 
-bool binaryTree::contains(int data)
+bool binarySearchTree::contains(int data)
 {
 	return contains(root, data);
 }
 
-bool binaryTree::contains(NODE node, int data)
+bool binarySearchTree::contains(NODE node, int data)
 {
 	if (node == nullptr)
 		return false;
@@ -115,7 +115,7 @@ bool binaryTree::contains(NODE node, int data)
 	return false;
 }
 
-void binaryTree::printInOrder(NODE node)
+void binarySearchTree::printInOrder(NODE node)
 {
 	if (node == nullptr)
 		return;
@@ -130,14 +130,14 @@ void binaryTree::printInOrder(NODE node)
 
 }
 
-void binaryTree::printInOrder()
+void binarySearchTree::printInOrder()
 {
 	printInOrder(root);
 
 	cout << endl;
 }
 
-void binaryTree::printPreOrder(NODE node)
+void binarySearchTree::printPreOrder(NODE node)
 {
 	if (node == nullptr)
 		return;
@@ -151,14 +151,14 @@ void binaryTree::printPreOrder(NODE node)
 		printPreOrder(node->rightChild);
 }
 
-void binaryTree::printPreOrder()
+void binarySearchTree::printPreOrder()
 {
 	printPreOrder(root);
 
 	cout << endl;
 }
 
-void binaryTree::printPostOrder(NODE node)
+void binarySearchTree::printPostOrder(NODE node)
 {
 	if (node == nullptr)
 		return;
@@ -172,7 +172,7 @@ void binaryTree::printPostOrder(NODE node)
 	cout << node->data << "\t";
 }
 
-void binaryTree::printPostOrder()
+void binarySearchTree::printPostOrder()
 {
 	printPostOrder(root);
 
@@ -181,7 +181,7 @@ void binaryTree::printPostOrder()
 
 int main()
 {
-	binaryTree BT;
+	binarySearchTree BT;
 
 	// 4, 5, 2, 9, 1, 3, 12
 	BT.insert(4);
@@ -201,5 +201,9 @@ int main()
 	cout << "Postorder Traversal......" << endl;
 	BT.printPostOrder();
 
+	cout << "Node 0 : " << (BT.contains(0) == true ? "Found" : "Not Found") << endl;
+	cout << "Node 12 : " << (BT.contains(12) == true ? "Found" : "Not Found") << endl;
+	cout << "Node 9 : " << (BT.contains(9) == true ? "Found" : "Not Found") << endl;
+	cout << "Node 50 : " << (BT.contains(50) == true ? "Found" : "Not Found") << endl;
 	return 0;
 }
