@@ -6,41 +6,41 @@ using namespace std;
 
 //const int NUM_LETTERS = 26;
 
-using CharCount = map<char, int>;
+using CharCountMap = map<char, int>;
 
-CharCount getCharCounts(string str)
+CharCountMap getCharCountMapping(string str)
 {
-	CharCount cc;
+	CharCountMap ccMapping;
 	for (auto ch : str)
 	{
-		cc[ch]++;
+		ccMapping[ch]++;
 	}
-	return move(cc);
+	return move(ccMapping);
 }
 
-int getDelta(CharCount& cc1, CharCount& cc2)
+int getDelta(CharCountMap& ccMapping1, CharCountMap& ccMapping2)
 {
 	int delta = 0;
-	auto itrCC1 = cc1.begin();
-	while (itrCC1 != cc1.end())
+	auto itrccMapping1 = ccMapping1.begin();
+	while (itrccMapping1 != ccMapping1.end())
 	{
-		auto itrCC2 = cc2.find((*itrCC1).first);
-		if (itrCC2 != cc2.end())
+		auto itrccMapping2 = ccMapping2.find((*itrccMapping1).first);
+		if (itrccMapping2 != ccMapping2.end())
 		{
-			delta = delta + abs((*itrCC1).second - (*itrCC2).second);
-			cc2.erase((*itrCC1).first);
+			delta = delta + abs((*itrccMapping1).second - (*itrccMapping2).second);
+			ccMapping2.erase((*itrccMapping1).first);
 		}
 		else
-			delta = delta + (*itrCC1).second;
+			delta = delta + (*itrccMapping1).second;
 
-		itrCC1++;
+		itrccMapping1++;
 	}
 
-	auto itrCC2 = cc2.begin();
-	while (itrCC2 != cc2.end())
+	auto itrccMapping2 = ccMapping2.begin();
+	while (itrccMapping2 != ccMapping2.end())
 	{
-		delta = delta + (*itrCC2).second;
-		itrCC2++;
+		delta = delta + (*itrccMapping2).second;
+		itrccMapping2++;
 	}
 
 	return delta;
@@ -48,10 +48,10 @@ int getDelta(CharCount& cc1, CharCount& cc2)
 
 int numberNeeded(string str1, string str2)
 {
-	CharCount cc1 = getCharCounts(str1);
-	CharCount cc2 = getCharCounts(str2);
+	CharCountMap ccMapping1 = getCharCountMapping(str1);
+	CharCountMap ccMapping2 = getCharCountMapping(str2);
 
-	return getDelta(cc1, cc2);
+	return getDelta(ccMapping1, ccMapping2);
 }
 
 int main()
