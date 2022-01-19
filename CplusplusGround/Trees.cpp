@@ -115,6 +115,13 @@ bool binarySearchTree::contains(NODE node, int data)
 	return false;
 }
 
+void binarySearchTree::printInOrder()
+{
+	printInOrder(root);
+
+	cout << endl;
+}
+
 void binarySearchTree::printInOrder(NODE node)
 {
 	if (node == nullptr)
@@ -130,9 +137,9 @@ void binarySearchTree::printInOrder(NODE node)
 
 }
 
-void binarySearchTree::printInOrder()
+void binarySearchTree::printPreOrder()
 {
-	printInOrder(root);
+	printPreOrder(root);
 
 	cout << endl;
 }
@@ -151,9 +158,9 @@ void binarySearchTree::printPreOrder(NODE node)
 		printPreOrder(node->rightChild);
 }
 
-void binarySearchTree::printPreOrder()
+void binarySearchTree::printPostOrder()
 {
-	printPreOrder(root);
+	printPostOrder(root);
 
 	cout << endl;
 }
@@ -172,12 +179,6 @@ void binarySearchTree::printPostOrder(NODE node)
 	cout << node->data << "\t";
 }
 
-void binarySearchTree::printPostOrder()
-{
-	printPostOrder(root);
-
-	cout << endl;
-}
 
 int main()
 {
