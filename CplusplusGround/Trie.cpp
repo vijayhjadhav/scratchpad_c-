@@ -13,10 +13,10 @@ public:
 	{
 		cout << "constructor called" << endl;
 		children.resize(ALHABET_SIZE, nullptr);
-		for (int i = 0; i < ALHABET_SIZE; i++)
+		/*for (int i = 0; i < ALHABET_SIZE; i++)
 		{
 			children[i] = nullptr;
-		}
+		}*/
 	}
 
 	// copy constructor 
