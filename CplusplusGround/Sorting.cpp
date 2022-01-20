@@ -55,6 +55,8 @@ void mySort::heapify(vector<int>& arrNums, int n, int i)
 	}
 }
 
+// Time complexity : O(nlogn)
+// Space complexity : O(1)
 void mySort::heapSort(vector<int>& arrNums, int n)
 {
 	// Build heap
